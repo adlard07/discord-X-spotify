@@ -28,6 +28,18 @@ A Discord bot that allows users to play, pause, resume, skip, and stop songs fro
    python bot.py
    ```
 
+## Finding Your Spotify User ID
+
+To find your Spotify User ID, follow these steps:
+
+1. Go to your [Spotify Profile](https://www.spotify.com).
+2. Your user ID is located in your Spotify account settings. 
+
+Here is an image showing where to find it:
+
+![Spotify User ID Location](assets/user_id.png)
+
+
 ## Usage
 1. Invite the bot to your server.
 2. Join a voice channel in your Discord server.
