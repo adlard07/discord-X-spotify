@@ -1,0 +1,6 @@
+discord.py
+yt-dlp
+ffmpeg-python
+configparser
+youtube-dl
+spotipy
