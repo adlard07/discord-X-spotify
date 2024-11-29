@@ -2,13 +2,11 @@ import discord
 from discord.ext import commands
 import asyncio
 import configparser
-import yt_dlp
-import youtube_dl
-from get_spotify import SpotifyManager
-from get_youtube import Songs
-from logger import logging
-from discord_manager import MusicCommands  # Import the MusicCommands cog
-
+from discord_utils.embeds import View
+from utils.get_spotify import SpotifyManager
+from utils.get_youtube import Songs
+from utils.logger import logging
+from discord_utils.commands import MusicCommands  # Import the MusicCommands cog
 
 # Configuration
 config = configparser.ConfigParser()
@@ -34,14 +32,38 @@ class MusicBot(commands.Bot):
             self.added_cog = True
 
     async def on_ready(self):
+        """Event triggered when the bot is ready."""
+        # Set a custom presence
+        activity = discord.Activity(type=discord.ActivityType.listening, name="Spotify Playlists 🎧")
+        await self.change_presence(status=discord.Status.online, activity=activity)
         print(f"Bot is ready! Logged in as {self.user}")
-        print("--Registered commands--")
-        for command in self.commands:
-            print(f"!{command.name}")
 
-# Run the bot
+# Create bot instance in main function
 def main():
     bot = MusicBot()
+
+    @bot.command(name="welcome")
+    async def welcome(ctx):
+        """Send a fancy welcome embed."""
+        embed = View.welcome_embed()
+        await ctx.send(embed=embed)
+
+    @bot.command(name="info")
+    async def info(ctx):
+        """Send a fancy info embed."""
+        embed = View.info_embed()
+        await ctx.send(embed=embed)
+
+    @bot.command(name="poll")
+    async def poll(ctx):
+        """Send a poll embed with reactions."""
+        embed = View.poll_embed()
+        message = await ctx.send(embed=embed)
+        await message.add_reaction("🎸")
+        await message.add_reaction("🎹")
+        await message.add_reaction("🎤")
+        await message.add_reaction("🎧")
+
     bot.run(DISCORD_TOKEN)
 
 if __name__ == "__main__":

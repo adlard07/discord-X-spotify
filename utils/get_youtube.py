@@ -1,5 +1,5 @@
 import yt_dlp
-from logger import logging
+from utils.logger import logging
 
 class Songs:
     def __init__(self, query):
