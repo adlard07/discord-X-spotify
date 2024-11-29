@@ -7,6 +7,7 @@ from utils.get_youtube import Songs
 import youtube_dl
 from discord import FFmpegPCMAudio
 import pafy
+import random
 
 # Remove the bug_reports_message line to avoid conflict
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -237,11 +238,19 @@ class MusicCommands(commands.Cog):
     @commands.command(name='stop')
     async def stop(self, ctx):
         """Stop the current song and disconnect."""
-        if ctx.voice_client and ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-            await ctx.send("Stopped the song.")
+        if ctx.voice_client:
+            await ctx.voice_client.disconnect()
+            await ctx.send("Disconnected from the voice channel.")
 
-        await ctx.voice_client.disconnect()
-        self.voice_client = None
-        self.current_track_index = 0  # Reset track index
-        await ctx.send("Disconnected from the voice channel.")
+
+    @commands.command(name='shuffle')
+    async def shuffle_playlist(self, ctx):
+        """Shuffle the playlist and play tracks in random order."""
+        if not self.playlist_id:
+            await ctx.send("Please set the playlist first using !playlist [playlist_id]")
+            return
+
+        # Create a list of indices from 0 to len(track_keys)
+        track_indices = list(range(len(track_keys)))
+
+        
