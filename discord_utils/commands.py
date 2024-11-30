@@ -39,6 +39,7 @@ class MusicCommands(commands.Cog):
         self.playlist_id = None
         self.current_track_index = 0  # Pointer to current track
         self.is_playing = False
+        self.shuffled_indices = []  # To track shuffled order
 
     async def connect_to_voice(self, ctx):
         """Ensure the bot is connected to the user's voice channel."""
@@ -50,6 +51,30 @@ class MusicCommands(commands.Cog):
                 await ctx.send("You must be in a voice channel for the bot to join.")
                 return False
         return True
+
+    async def shuffle_playlist(self, ctx):
+        """Shuffle the playlist and play a random track."""
+        if not self.playlist_id:
+            await ctx.send("Please set the playlist first using !playlist [playlist_id]")
+            return
+
+        # Get the playlist tracks
+        track_dict = sp.get_tracks(self.playlist_id)
+        track_keys = list(track_dict.keys())
+
+        # If shuffled indices are empty, initialize with all track indices
+        if not self.shuffled_indices:
+            self.shuffled_indices = list(range(len(track_keys)))
+            random.shuffle(self.shuffled_indices)  # Shuffle the indices
+
+        # Get the next track index from the shuffled list
+        if self.shuffled_indices:
+            self.current_track_index = self.shuffled_indices.pop(0)  # Remove and get the next track
+            await self.play_song(ctx)
+        else:
+            await ctx.send("Playlist has been exhausted in shuffle mode.")
+            self.is_playing = False
+
 
     async def play_song(self, ctx, song_url=None, song_name=None):
         """Play the current song using the track pointer or a YouTube URL."""
@@ -242,15 +267,10 @@ class MusicCommands(commands.Cog):
             await ctx.voice_client.disconnect()
             await ctx.send("Disconnected from the voice channel.")
 
-
     @commands.command(name='shuffle')
-    async def shuffle_playlist(self, ctx):
-        """Shuffle the playlist and play tracks in random order."""
-        if not self.playlist_id:
-            await ctx.send("Please set the playlist first using !playlist [playlist_id]")
+    async def shuffle_command(self, ctx):
+        """Command to shuffle the playlist."""
+        if self.is_playing:
+            await ctx.send("Shuffle cannot be performed while a song is playing. Use !skip or !stop first.")
             return
-
-        # Create a list of indices from 0 to len(track_keys)
-        track_indices = list(range(len(track_keys)))
-
-        
+        await self.shuffle_playlist(ctx)
